@@ -8,10 +8,14 @@ Created on Fri Oct  17 18:03:50 2014
 import pandas as pd
 import random
 import numpy as np
+import nltk
+
 from tweet_tokenizer import tokenize_tweet
+import tweet_tokenizer as twk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectPercentile, chi2
 from Feature import FeatureStacker
+from Feature import BadWordCounter
 
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
@@ -44,8 +48,13 @@ def build_base_model():
     countvect_word =  TfidfVectorizer(tokenizer=tokenize_tweet, analyzer="word", 
                                       binary=True, ngram_range=(1,2), 
                                       stop_words='english')
+    #countvect_postag = TfidfVectorizer(tokenizer=twk.get_pos_tags, binary=False, 
+    #                                   ngram_range=(1,3), analyzer="word") 
+    bad_words = BadWordCounter()
+                                   
     clf = LogisticRegression(tol=1e-6, C=6)
-    ft = FeatureStacker([('chars', countvect_char), ('words', countvect_word)])
+    ft = FeatureStacker([('words', countvect_word), 
+                        ('bad_words', bad_words)])
     pipeline = Pipeline([('vect', ft), ('select', select), ('logr', clf)])
     return pipeline
     
