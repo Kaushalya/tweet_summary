@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
 Created on Sun Nov 09 22:52
-
+Labels tweets as ibjective/subjective and clusters them using DBScan algorithm
+on NER tags of a tweet.
 '''
+
 import sklearn
 import cPickle
 import glob
@@ -51,17 +53,19 @@ def remove_duplicates(tweets, is_objective, n):
 def cluster_tweets(tweets):
     #TODO get TFIDF vector
     #do clustering
-    vectorizer = TfidfVectorizer(preprocessor=_dummy_preprocess, tokenizer=get_ner_tags,
+    ner_tags = [get_ner_tags(tweet).tolist() for tweet in tweets['tweet']]
+    vectorizer = TfidfVectorizer(preprocessor=_dummy_preprocess, tokenizer=lambda x:x,
                                  binary=True,
                                  min_df=0, use_idf=True, smooth_idf=True)
-    tfidf = vectorizer.fit_transform(tweets['tweet']) 
+    tfidf = vectorizer.fit_transform(ner_tags) 
     
     #ner_tags = [get_ner_tags(tweet) for tweet in tweets['tweet']]
     print "clustering started"
     t0 = time()
     #cluster = AgglomerativeClustering(n_clusters=3, affinity="cosine" )
-    #cluster = MiniBatchKMeans(n_clusters=10, max_iter=100, batch_size=100)    
-    cluster = DBSCAN(min_samples=2, eps=0.3)    
+    #cluster = MiniBatchKMeans(n_clusters=10, max_iter=100, batch_size=100) 
+    #metric=sklearn.metrics.pairwise.cosine_distances
+    cluster = DBSCAN(min_samples=2, eps=0.5)    
         
     clustered = cluster.fit(tfidf.todense())
        
@@ -71,9 +75,11 @@ def cluster_tweets(tweets):
     print "clustering finished in %.3f seconds"%(time()-t0)   
     print "%d clusters detected"%n_clusters_
     
-    return clustered
+    tweets['cluster'] = labels
+    tweets['ner'] = ner_tags
+    return tweets
 
-#TODO select the informative tweets first
+#select the informative tweets first
 def select_tweets(model, tweets):
     #for tw_file in glob.glob(data_path):     
     bdw = BadWordCounter()
@@ -98,12 +104,32 @@ def select_tweets(model, tweets):
     #print 'duplication detection completed in %.3f'%t1
     #print str(len(selected))
     important_tweets = tweets[selected==True]   
-    tweets['predicted'] = selected
-    print 'here'
+    #tweets['predicted'] = selected
     return important_tweets
 
+def summarize_text(model, inputfile, outputfile):
+    if model==None:
+        return "Model loading failed"
+          
+    tweets = pd.DataFrame()
+    ind = 0
+    
+    for tw_file in glob.glob(inputfile):
+        print '%d : %s '%(ind,tw_file)
+        file_data = pd.read_csv(tw_file, header=0, index_col='status_id')
+        tweets = tweets.append(file_data.dropna())
+        ind += 1
+        
+    important = select_tweets(model, tweets)
+    print 'Number of objective tweets: '+str(important.shape[0])
+    important_clustered = cluster_tweets(important)
+
+    #important['cluster'] = cluster_tweets.labels_
+    important_clustered.to_csv(outputfile)
+    #tweets.to_csv('/home/kaushalya/Code/MCS Project/data/output/dbscan.csv')
+
 if __name__ == '__main__':
-    model = load_model('../models/Ebola/linsvc_model_stems_pos.pkl')
+    model = load_model('../models/Ebola/linsvc_model_stems_senna_pos.pkl')
     tweets = pd.DataFrame()
     ind = 0
     
@@ -117,8 +143,8 @@ if __name__ == '__main__':
     
     important = select_tweets(model, tweets)
     print 'Number of objective tweets: '+str(important.shape[0])
-    cluster_tweets = cluster_tweets(important)
-    #tweets['cluster'] = cluster_tweets.labels_
-    important['cluster'] = cluster_tweets.labels_
-    important.to_csv('/home/kaushalya/Code/MCS Project/data/output/Ebola/dbs_pos_gate_entity_senna_20141111.csv')
+    important_clustered = cluster_tweets(important)
+
+    #important['cluster'] = cluster_tweets.labels_
+    #important_clustered.to_csv('/home/kaushalya/Code/MCS Project/data/output/SLvENG/SLvENG_summary3.csv')
     #tweets.to_csv('/home/kaushalya/Code/MCS Project/data/output/dbscan.csv')

@@ -41,13 +41,20 @@ def get_tweets(folder):
     return tweets
 
 def load_model(model_f):
-    with open(model_f, 'rb') as fid:
-        model = cPickle.load(fid)
-        
-    return model
+    try:
+        with open(model_f, 'rb') as fid:
+            model = cPickle.load(fid)
+        print 'model loaded successfully'
+        return model
+        #break
+    
+    except IOError:
+        print 'Error loading model file'        
+           
+    return None
 
-def save_model(model):
-    with open('../models/Ebola/linsvc_model_stems_senna_3000.pkl', 'wb') as fid:
+def save_model(model, path):
+    with open(path, 'wb') as fid:
         cPickle.dump(model, fid)        
 
 
@@ -79,9 +86,12 @@ def build_base_model():
     #clf = LogisticRegression(tol=1e-6, C=19)
     #clf = MultinomialNB()
     clf = LinearSVC(class_weight='auto', C=1)                                                            
+                       
+                   
+    ft = FeatureStacker([('words', countvect_word),
+                         ('bad_words', bad_words),
+                         ('pos_tags', countvect_postag)])
                          
-    ft = FeatureStacker([('words', countvect_word), ('bad_words', bad_words),
-                        ('pos_tags', countvect_postag)])
     pipeline = Pipeline([('vect', ft), ('select', select), ('clf', clf)])
     return pipeline
     
@@ -94,7 +104,7 @@ def run_gridsearch(train_data, test_data):
     print(grid_search.best_score_)
     print(grid_search.best_params_)                         
                                       
-def run_tests(train_data, test_data):  
+def run_tests(train_data, test_data, model_path=None):  
     Y_train = np.array(train_data['formal'])
     Y_test = np.array(test_data['formal'])
     
@@ -108,15 +118,23 @@ def run_tests(train_data, test_data):
     predicted = base_model.predict(test_data['tweet'])
     print "*** LogReg base model"
     print_performance(Y_test, predicted, base_model)
-    save_model(base_model)
+    
+    if model_path!=None:
+        save_model(base_model, model_path)
+        
     return predicted
 
 def eval_model(model, X, real):
     predicted = model.predict(X)
     print_performance(real, predicted, model)
+    return predicted
     
 
-def _get_sample(data, n_sample):
+def _get_sample(data, n_sample, rand_selection=True):
+    
+    if not rand_selection:
+        return data.iloc[:n_sample]
+    
     ids = random.sample(xrange(data.shape[0]-1), n_sample)
     return data.iloc[ids]
 
@@ -133,16 +151,21 @@ def get_datasets(gold_tweets):
 
 
 if __name__ == '__main__':
-    tweets_class1 = pd.read_csv('../../data/training/Ebola/training_verified.csv').dropna()
-    tweets_class2 = pd.read_csv('../../data/training/Ebola/training_emoji.csv').dropna()
+    tweets_class1 = pd.read_csv('../../data/training/INDvSL/training_verified.csv').dropna()
+    tweets_class2 = pd.read_csv('../../data/training/INDvSL/training_emoji.csv').dropna()
     tweets_class1['formal'] = 1 #Verified tweets
     tweets_class2['formal'] = 0 #tweets with emoticons
     class_size = min([ 3001,len(tweets_class1), len(tweets_class2)])-1
-    print "%s istances from each class"%class_size    
-    gold_tweets = pd.concat([_get_sample(tweets_class1, class_size), _get_sample(tweets_class2.dropna(),class_size)])
+    print "%s instances from each class"%class_size    
+    gold_tweets = pd.concat([_get_sample(tweets_class1, class_size, rand_selection=True), 
+                             _get_sample(tweets_class2.dropna(),class_size, rand_selection=True)])
     data = get_datasets(gold_tweets)
-
-    #model = load_model('../models/linsvc_model_nowords_pos_correct.pkl')
-    #eval_model(model, data[1]['tweet'], data[1]['formal'])
-    predicted = run_tests(data[0], data[1])
+    #gold_tweets = pd.concat([tweets_class1, tweets_class2])
+    
+    #gold_tweets = pd.read_csv('../../data/gold standard/ebola_gold.csv')
+    #model = load_model('/home/kaushalya/Code/MCS Project/tweet_summarizer/models/Ebola/linsvc_model_stems_senna_pos.pkl')
+    #predicted = eval_model(model, gold_tweets['tweet'], gold_tweets['formal'])
+    #gold_tweets['predicted'] = predicted
+    #gold_tweets.to_csv('../../data/output/Ebola/gold_output.csv', index=False)
+    predicted = run_tests(data[0], data[1], model_path="../models/cricket/linsvc_model_stems_pos_senna.pkl")
     #run_gridsearch(data[0], data[1])

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 #import nltk.corpus.reader.wordnet
-from nltk.corpus import wordnet
+from nltk.corpus import wordnet as wn
 from nltk.wsd import lesk
 import nltk
 import nlpnet
@@ -9,6 +9,8 @@ from tweet_tokenizer import clean_tweet
 from tweet_tokenizer import get_clean_tokens
 
 from nltk.tree import Tree
+
+import gensim
 
 #text1 = 'They are going to rob the bank'
 #text2 = 'I paid using my credit card'
@@ -29,14 +31,23 @@ tweet3 = "CBS' Lara Logan voluntarily quarantined after filing Ebola report from
 #tagger = nlpnet.SRLTagger()
 #tags = tagger.tag(unicode(tweet))
 
-tokens = get_clean_tokens(tweet3)
-pos_tags = nltk.pos_tag(tokens)
-ner = nltk.ne_chunk(pos_tags)
+def syn(word, lch_threshold=2.26):
+    for net1 in wn.synsets(word):
+        for net2 in wn.all_synsets():
+            try:
+                lch = net1.lch_similarity(net2)
+            except:
+                continue
+            # The value to compare the LCH to was found empirically.
+            # (The value is very application dependent. Experiment!)
+            if lch >= lch_threshold:
+                yield (net1, net2, lch)
 
-print ner
-entities = []
-for entity in ner:
-    if isinstance(entity,Tree):
-        print "entity"+str(entity)
-        entities.append(str(entity))
+words = ["flood", "flooding"]
+
+syns = wn.synsets('flood')
+
+for x in syn('flood'):
+    print x
+
 #print(ner)

@@ -31,10 +31,11 @@ for tw_file in glob.glob(data_path):
     e_t = [tweets.iloc[i] for i in emoji_tweet_indices]    
     emoji_tweets = emoji_tweets.append(tweets.iloc[emoji_tweet_indices])
    
+print "Read %d total tweets" % tweet_count   
 print "Found %d tweets with emoji" %len(emoji_tweets)
 print "Found %d tweets from verified accounts" %len(verified_tweets)
-verified_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/INDvSL/training/verified_tweets_v2.csv')
-emoji_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/INDvSL/training/emoji_tweets_v3.csv')
+verified_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/INDvSL/training/training_verified.csv')
+emoji_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/INDvSL/training/training_emoji.csv')
 #verified_tweets[['screen_name', 'tweet']].to_csv('/home/kaushalya/Code/MCS Project/data/output/verified_sample.csv')
 
 #with open('../data/verified_sample.csv', 'w', newline='') as output:

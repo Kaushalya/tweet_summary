@@ -29,15 +29,11 @@ def extract_entities(text):
 
 def get_ner_tags(text):
     tokens = get_clean_tokens(text)
-    tokens2 = get_clean_tokens(text.lower())
-    pos_tags = nltk.pos_tag(tokens2)
+    pos_tags = twk.ptagger.tag(tokens)
    
-    pos2 = twk.ptagger.tag(tokens)
-    #pos2 = [(tokens[i], pos_tags[i][1]) for i in range(len(tokens))]    
-    #print pos2
-    ne_tags = nltk.ne_chunk(pos2)
     #print pos_tags
-    #print pos2
+    ne_tags = nltk.ne_chunk(pos_tags)
+
     
     entities = []    
     
@@ -86,9 +82,16 @@ if __name__ == '__main__':
     t1 = "Last US Ebola Patient Is Cured: Dr. Craig Spencer To Be Released… http://t.co/92JfMm2LaN | http://t.co/NoFij4iACl #news"
     t2 = '#Ebola Ebola Outbreak: US Free of Virus After New York Doctor Craig Spencer Cleared - International Business Times UK' 
     
-    print nltk.metrics.distance.edit_distance(t1, t2)
-    print get_edit_distance(t1, t2)
-    print get_ner_tags(t1)
-    print get_ner_tags(t2)
-    print 'jaccard sim= %f'%get_jaccard_sim(t1, t2)
-    print 'entity similarity= %.2f'%get_entity_similarity(t1,t2)
+    t3 = "RT @KarenChestney: Last U.S. Ebola Patient Is Cured: Dr. Craig Spencer to Be Released http://t.co/crVMTo1KPc via @NBCNews--Thanks U.S. Heal…"
+    t4 = "Last US Ebola Patient Is Cured: Dr. Craig Spencer to Be Released… http://t.co/92JfMm2LaN | http://t.co/NoFij4iACl #news"
+    t5 = "What's New? Last US Ebola Patient Is Cured: Dr. Craig Spencer to Be Released - http://t.co/m6Q6R0sbr2 http://t.co/hVcqvivxxO"
+
+    tweets = [t1, t2, t3, t4, t5]    
+    
+    for tw in tweets:
+        print get_ner_tags(tw)
+    
+#    print get_ner_tags(t1)
+#    print get_ner_tags(t2)
+#    print 'jaccard sim= %f'%get_jaccard_sim(t1, t2)
+#    print 'entity similarity= %.2f'%get_entity_similarity(t1,t2)
