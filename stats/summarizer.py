@@ -89,20 +89,18 @@ def select_tweets(model, tweets):
     good_tweets = np.array([(not bdw.has_bad_word(tweet) and not bdw.has_slang(tweet)) for tweet in tweets['tweet']])        
     predicted = model.predict(tweets[good_tweets==True]['tweet'])     
         
-    print "num of good tweets: %d"%count_nonzero(good_tweets)        
-        
     bad_tweets = np.empty([num_tweets], dtype='bool')
     bad_tweets.fill(False)
         
     bad_tweets[good_tweets==True] = predicted        
-    print "predicted good = %d"%count_nonzero(predicted)        
+    print "predicted good = %d"%np.count_nonzero(predicted)        
         
     print 'duplication detection running'
     t0 = time()
     selected = remove_duplicates(tweets, bad_tweets, num_tweets)
     t1 = time()-t0
-    #print 'duplication detection completed in %.3f'%t1
-    #print str(len(selected))
+    print 'duplication detection completed in %.3f'%t1
+    print 'Number of tweets when duplicates are removed %d'%(len(selected))
     important_tweets = tweets[selected==True]   
     #tweets['predicted'] = selected
     return important_tweets
@@ -133,7 +131,7 @@ if __name__ == '__main__':
     tweets = pd.DataFrame()
     ind = 0
     
-    for tw_file in glob.glob('/home/kaushalya/Code/MCS Project/data/Ebola4/tweets_20141111*.csv'):
+    for tw_file in glob.glob('/home/kaushalya/Code/MCS Project/data/Ebola4/tweets_20141111-093430.csv'):
         print '%d : %s '%(ind,tw_file)
         file_data = pd.read_csv(tw_file, header=0, index_col='status_id')
         tweets = tweets.append(file_data.dropna())
