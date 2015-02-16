@@ -8,7 +8,7 @@ import tweet_tokenizer as twt
 import enchant
 
 '''
-This class is taken from amueller's kaggle_insluts project.
+This class is based on amueller's kaggle_insluts project.
 https://github.com/amueller/kaggle_insults
 '''
 class BadWordCounter(BaseEstimator):

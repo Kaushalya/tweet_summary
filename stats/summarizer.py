@@ -100,9 +100,9 @@ def select_tweets(model, tweets):
     selected = remove_duplicates(tweets, bad_tweets, num_tweets)
     t1 = time()-t0
     print 'duplication detection completed in %.3f'%t1
-    print 'Number of tweets when duplicates are removed %d'%(len(selected))
-    important_tweets = tweets[selected==True]   
-    #tweets['predicted'] = selected
+    
+    important_tweets = tweets[selected==True] 
+    
     return important_tweets
 
 def summarize_text(model, inputfile, outputfile):
@@ -127,7 +127,7 @@ def summarize_text(model, inputfile, outputfile):
     #tweets.to_csv('/home/kaushalya/Code/MCS Project/data/output/dbscan.csv')
 
 if __name__ == '__main__':
-    model = load_model('../models/Ebola/linsvc_model_stems_senna_pos.pkl')
+    model = load_model('/home/kaushalya/Desktop/Defense/Models/Cricket.pkl')
     tweets = pd.DataFrame()
     ind = 0
     

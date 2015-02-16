@@ -7,7 +7,7 @@ import numpy as np
 import glob
 import re
 
-data_path = '/home/kaushalya/Code/MCS Project/data/INDvSL/*.csv'
+data_path = '/home/kaushalya/Code/MCS Project/data/SLvNZ/*.csv'
 verified_tweets = pd.DataFrame()
 emoji_tweets = pd.DataFrame()
 tweet_count = 0
@@ -34,8 +34,8 @@ for tw_file in glob.glob(data_path):
 print "Read %d total tweets" % tweet_count   
 print "Found %d tweets with emoji" %len(emoji_tweets)
 print "Found %d tweets from verified accounts" %len(verified_tweets)
-verified_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/INDvSL/training/training_verified.csv')
-emoji_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/INDvSL/training/training_emoji.csv')
+verified_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/SLvNZ/training/training_verified.csv')
+emoji_tweets.to_csv('/home/kaushalya/Code/MCS Project/data/SLvNZ/training/training_emoji.csv')
 #verified_tweets[['screen_name', 'tweet']].to_csv('/home/kaushalya/Code/MCS Project/data/output/verified_sample.csv')
 
 #with open('../data/verified_sample.csv', 'w', newline='') as output:

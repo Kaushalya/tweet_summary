@@ -1,3 +1,7 @@
+import sys
+sys.path.append('../stats')
+sys.path.append('../utils')
+
 import Tkinter
 from tkFileDialog import *
 import tkMessageBox
@@ -12,7 +16,7 @@ statusText = Tkinter.StringVar()
 model = None
 
 def quitCallback():
-   tkMessageBox.showinfo( "Hello Python", "Hello World")
+    root.destroy()
 
 def openCallback(textVar):
     fileName = askopenfilename(parent=root)

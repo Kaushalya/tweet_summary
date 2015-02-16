@@ -84,7 +84,7 @@ if __name__ == '__main__':
     
     t3 = "RT @KarenChestney: Last U.S. Ebola Patient Is Cured: Dr. Craig Spencer to Be Released http://t.co/crVMTo1KPc via @NBCNews--Thanks U.S. Heal…"
     t4 = "Last US Ebola Patient Is Cured: Dr. Craig Spencer to Be Released… http://t.co/92JfMm2LaN | http://t.co/NoFij4iACl #news"
-    t5 = "What's New? Last US Ebola Patient Is Cured: Dr. Craig Spencer to Be Released - http://t.co/m6Q6R0sbr2 http://t.co/hVcqvivxxO"
+    t5 = "90th fifty for @KumarSanga2 , 51* off 64 balls. SL 151/2 in 28 overs. #SLvENG"
 
     tweets = [t1, t2, t3, t4, t5]    
     

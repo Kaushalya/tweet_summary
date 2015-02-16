@@ -151,8 +151,8 @@ def get_datasets(gold_tweets):
 
 
 if __name__ == '__main__':
-    tweets_class1 = pd.read_csv('../../data/training/INDvSL/training_verified.csv').dropna()
-    tweets_class2 = pd.read_csv('../../data/training/INDvSL/training_emoji.csv').dropna()
+    tweets_class1 = pd.read_csv('../../data/training/SLvNZ/training_verified.csv').dropna()
+    tweets_class2 = pd.read_csv('../../data/training/SLvNZ/training_emoji.csv').dropna()
     tweets_class1['formal'] = 1 #Verified tweets
     tweets_class2['formal'] = 0 #tweets with emoticons
     class_size = min([ 3001,len(tweets_class1), len(tweets_class2)])-1
